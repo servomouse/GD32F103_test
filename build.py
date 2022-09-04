@@ -13,8 +13,8 @@ files = [   "src/gd32f10x_it.c",
         ]
 
 # common_path = "C:/Soft/gcc-arm-none-eabi/bin/"
-common_path = "/media/master/0E5513DF0E5513DF/Work/GD32/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/"
-# common_path = "/usr/bin/"
+# common_path = "/media/master/0E5513DF0E5513DF/Work/GD32/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/"
+common_path = "/usr/bin/"
 
 stlink_path = "/media/master/0E5513DF0E5513DF/Work/Python/PySTLINK/pystlink"
 
@@ -94,9 +94,8 @@ def main():
             convert_elf()
             subprocess.call(f'{common_path}arm-none-eabi-objdump --disassemble temp_files/main.elf > temp_files/main.list', shell=True)
             subprocess.call('rm -r temp_files/*', shell=True)
-    # subprocess.call(f'{stlink_path}/./pystlink flash:erase:verify:gd32f10x/build_BluePill/Blink_BluePill.bin', shell=True)
-    subprocess.call(f'{stlink_path}/./pystlink flash:erase:verify:firmware.bin', shell=True)
-            # subprocess.call(f'{common_path}arm-none-eabi-size.exe main.elf', shell=True)
+    if os.path.isdir(stlink_path):
+        subprocess.call(f'{stlink_path}/./pystlink flash:erase:verify:firmware.bin', shell=True)
 
 
 if __name__ == '__main__':

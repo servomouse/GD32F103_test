@@ -1,0 +1,1 @@
+A simple blink template project. To build, specify the path to the compiler (the common_path variable in the build.py file). To flash the MCU, either set the stlink_path variable in the build.py file, or flash firmware.bin with your favourite programmer
