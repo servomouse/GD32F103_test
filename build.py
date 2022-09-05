@@ -4,12 +4,20 @@ import time
 
 files = [   "src/gd32f10x_it.c",
             "src/system_gd32f10x.c",
+            "src/gd32f10x_eval.c",
+            "src/gd32f10x_usbd_hw.c",
             "src/startup_gd32f10x_md.s",
             "src/main.c",
             "src/systick.c",
             "Firmware/Peripherals/Source/gd32f10x_rcu.c",
             "Firmware/Peripherals/Source/gd32f10x_gpio.c",
-            "Firmware/Peripherals/Source/gd32f10x_misc.c"
+            "Firmware/Peripherals/Source/gd32f10x_misc.c",
+            "Firmware/Peripherals/USB/usbd_lld_int.c",
+            "Firmware/Peripherals/USB/usbd_lld_core.c",
+            "Firmware/Peripherals/USB/usbd_core.c",
+            "Firmware/Peripherals/USB/cdc_acm_core.c",
+            "Firmware/Peripherals/USB/usbd_transc.c",
+            "Firmware/Peripherals/USB/usbd_enum.c",
         ]
 
 # common_path = "C:/Soft/gcc-arm-none-eabi/bin/"
@@ -30,6 +38,7 @@ compiler_flags =   ["-c",
                     "-I Firmware/Include",
                     "-I Firmware/CMSIS/CoreSupport",
                     "-I Firmware/Peripherals/Include",
+                    "-I Firmware/Peripherals/USB",
                     "-I src",
                     "-Os",
                     "-Wall -Wpedantic -Wextra",
@@ -94,8 +103,8 @@ def main():
             convert_elf()
             subprocess.call(f'{common_path}arm-none-eabi-objdump --disassemble temp_files/main.elf > temp_files/main.list', shell=True)
             subprocess.call('rm -r temp_files/*', shell=True)
-    if os.path.isdir(stlink_path):
-        subprocess.call(f'{stlink_path}/./pystlink flash:erase:verify:firmware.bin', shell=True)
+            if os.path.isdir(stlink_path):
+                subprocess.call(f'{stlink_path}/./pystlink flash:erase:verify:firmware.bin', shell=True)
 
 
 if __name__ == '__main__':

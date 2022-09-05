@@ -1,6 +1,6 @@
 /*!
-    \file    gd32f10x_libopt.h
-    \brief   library optional for gd32f10x
+    \file    gd32f10x_usbd_hw.c
+    \brief   main interrupt service routines
 
     \version 2020-07-17, V3.0.0, firmware for GD32F10x
     \version 2022-06-30, V3.1.0, firmware for GD32F10x
@@ -33,31 +33,58 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef __GD32F10X_LIBOPT_H
-#define __GD32F10X_LIBOPT_H
+#include "usbd_hw.h"
 
-#include "gd32f10x_fmc.h"
-#include "gd32f10x_pmu.h"
-#include "gd32f10x_bkp.h"
-#include "gd32f10x_rcu.h"
-#include "gd32f10x_exti.h"
-#include "gd32f10x_gpio.h"
-#include "gd32f10x_crc.h"
-#include "gd32f10x_dma.h"
-#include "gd32f10x_dbg.h"
-#include "gd32f10x_adc.h"
-#include "gd32f10x_dac.h"
-#include "gd32f10x_fwdgt.h"
-#include "gd32f10x_wwdgt.h"
-#include "gd32f10x_rtc.h"
-#include "gd32f10x_timer.h"
-#include "gd32f10x_usart.h"
-#include "gd32f10x_i2c.h"
-#include "gd32f10x_spi.h"
-#include "gd32f10x_sdio.h"
-#include "gd32f10x_exmc.h"
-#include "gd32f10x_can.h"
-#include "gd32f10x_enet.h"
-#include "gd32f10x_misc.h"
+/*!
+    \brief      configure the different system clocks
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
+void rcu_config(void)
+{
+    uint32_t system_clock = rcu_clock_freq_get(CK_SYS);
 
-#endif /* __GD32F10X_LIBOPT_H */
+    /* enable USB pull-up pin clock */ 
+    rcu_periph_clock_enable(RCU_AHBPeriph_GPIO_PULLUP);
+
+    if (system_clock == 48000000U) {
+        rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1);
+    } else if (system_clock == 72000000U) {
+        rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1_5);
+    } else if (system_clock == 96000000U) {
+        rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV2);
+    } else {
+        /*  reserved  */
+    }
+
+    /* enable USB APB1 clock */
+    rcu_periph_clock_enable(RCU_USBD);
+}
+
+/*!
+    \brief      configure the gpio peripheral
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
+void gpio_config(void)
+{
+    /* configure usb pull-up pin */
+    gpio_init(USB_PULLUP, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, USB_PULLUP_PIN);
+}
+
+/*!
+    \brief      configure interrupt priority
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
+void nvic_config(void)
+{
+    /* 1 bit for pre-emption priority, 3 bits for subpriority */
+    nvic_priority_group_set(NVIC_PRIGROUP_PRE1_SUB3);
+
+    /* enable the USB low priority interrupt */
+    nvic_irq_enable((uint8_t)USBD_LP_CAN0_RX0_IRQn, 1U, 0U);
+}

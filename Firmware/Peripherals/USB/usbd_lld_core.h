@@ -1,6 +1,6 @@
 /*!
-    \file    gd32f10x_libopt.h
-    \brief   library optional for gd32f10x
+    \file    usbd_lld_core.h
+    \brief   USB device low level driver core 
 
     \version 2020-07-17, V3.0.0, firmware for GD32F10x
     \version 2022-06-30, V3.1.0, firmware for GD32F10x
@@ -33,31 +33,42 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef __GD32F10X_LIBOPT_H
-#define __GD32F10X_LIBOPT_H
+#ifndef __USBD_LLD_CORE_H
+#define __USBD_LLD_CORE_H
 
-#include "gd32f10x_fmc.h"
-#include "gd32f10x_pmu.h"
-#include "gd32f10x_bkp.h"
-#include "gd32f10x_rcu.h"
-#include "gd32f10x_exti.h"
-#include "gd32f10x_gpio.h"
-#include "gd32f10x_crc.h"
-#include "gd32f10x_dma.h"
-#include "gd32f10x_dbg.h"
-#include "gd32f10x_adc.h"
-#include "gd32f10x_dac.h"
-#include "gd32f10x_fwdgt.h"
-#include "gd32f10x_wwdgt.h"
-#include "gd32f10x_rtc.h"
-#include "gd32f10x_timer.h"
-#include "gd32f10x_usart.h"
-#include "gd32f10x_i2c.h"
-#include "gd32f10x_spi.h"
-#include "gd32f10x_sdio.h"
-#include "gd32f10x_exmc.h"
-#include "gd32f10x_can.h"
-#include "gd32f10x_enet.h"
-#include "gd32f10x_misc.h"
+#include "usbd_lld_regs.h"
+#include "usbd_core.h"
 
-#endif /* __GD32F10X_LIBOPT_H */
+/* double buffer endpoint direction enumeration */
+enum dbuf_ep_dir
+{
+    DBUF_EP_IN,               /*!< double buffer in direction */
+    DBUF_EP_OUT,              /*!< double buffer out direction */
+    DBUF_EP_ERR,              /*!< double buffer error direction */
+};
+
+/* USBD endpoint ram structure */
+typedef struct 
+{
+    __IO uint32_t tx_addr;    /*!< transmission address */
+    __IO uint32_t tx_count;   /*!< transmission count */
+    __IO uint32_t rx_addr;    /*!< reception address */
+    __IO uint32_t rx_count;   /*!< reception count */
+} usbd_ep_ram;
+
+extern struct _usb_handler usbd_drv_handler;
+
+/* USB core driver structure */
+typedef struct 
+{
+    usb_basic  basic;
+    usb_dev    *dev;
+} usb_core_drv;
+
+extern usb_core_drv usbd_core;
+
+/* function declarations */
+/* free buffer used from application by toggling the SW_BUF byte */
+void user_buffer_free (uint8_t ep_num, uint8_t dir);
+
+#endif /* __USBD_LLD_CORE_H */

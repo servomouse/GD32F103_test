@@ -1,6 +1,6 @@
 /*!
-    \file    gd32f10x_libopt.h
-    \brief   library optional for gd32f10x
+    \file    usbd_lld_int.h
+    \brief   USB device low level interrupt handler
 
     \version 2020-07-17, V3.0.0, firmware for GD32F10x
     \version 2022-06-30, V3.1.0, firmware for GD32F10x
@@ -33,31 +33,17 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef __GD32F10X_LIBOPT_H
-#define __GD32F10X_LIBOPT_H
+#ifndef __USBD_LLD_INT_H
+#define __USBD_LLD_INT_H
 
-#include "gd32f10x_fmc.h"
-#include "gd32f10x_pmu.h"
-#include "gd32f10x_bkp.h"
-#include "gd32f10x_rcu.h"
-#include "gd32f10x_exti.h"
-#include "gd32f10x_gpio.h"
-#include "gd32f10x_crc.h"
-#include "gd32f10x_dma.h"
-#include "gd32f10x_dbg.h"
-#include "gd32f10x_adc.h"
-#include "gd32f10x_dac.h"
-#include "gd32f10x_fwdgt.h"
-#include "gd32f10x_wwdgt.h"
-#include "gd32f10x_rtc.h"
-#include "gd32f10x_timer.h"
-#include "gd32f10x_usart.h"
-#include "gd32f10x_i2c.h"
-#include "gd32f10x_spi.h"
-#include "gd32f10x_sdio.h"
-#include "gd32f10x_exmc.h"
-#include "gd32f10x_can.h"
-#include "gd32f10x_enet.h"
-#include "gd32f10x_misc.h"
+#include "usbd_core.h"
+#include "usbd_enum.h"
+#include "usbd_pwr.h"
 
-#endif /* __GD32F10X_LIBOPT_H */
+/* function declarations */
+/* USB device interrupt service routine */
+void usbd_isr (void);
+/* handle USB high priority successful transfer event */
+void usbd_int_hpst (usb_dev *udev);
+
+#endif /* __USBD_LLD_INT_H */

@@ -1,6 +1,8 @@
 {
     "files.associations": {
-        "gd32f10x.h": "c"
+        "gd32f10x.h": "c",
+        "usbd_hw.h": "c",
+        "usbd_conf.h": "c"
     }
 
 }

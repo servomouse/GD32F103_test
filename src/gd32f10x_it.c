@@ -1,16 +1,13 @@
 /*!
     \file    gd32f10x_it.c
-    \brief   interrupt service routines
+    \brief   main interrupt service routines
 
-    \version 2014-12-26, V1.0.0, firmware for GD32F10x
-    \version 2017-06-20, V2.0.0, firmware for GD32F10x
-    \version 2018-07-31, V2.1.0, firmware for GD32F10x
+    \version 2020-07-17, V3.0.0, firmware for GD32F10x
+    \version 2022-06-30, V3.1.0, firmware for GD32F10x
 */
 
 /*
-    Copyright (c) 2018, GigaDevice Semiconductor Inc.
-
-    All rights reserved.
+    Copyright (c) 2022, GigaDevice Semiconductor Inc.
 
     Redistribution and use in source and binary forms, with or without modification, 
 are permitted provided that the following conditions are met:
@@ -38,6 +35,7 @@ OF SUCH DAMAGE.
 
 #include "gd32f10x_it.h"
 #include "systick.h"
+#include "usbd_lld_int.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -58,8 +56,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
     /* if Hard Fault exception occurs, go to infinite loop */
-    while(1){
-    }
+    while (1);
 }
 
 /*!
@@ -149,3 +146,30 @@ void USART0_IRQHandler(void)
 
 }
 
+/*!
+    \brief      this function handles USBD interrupt
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
+void USBD_LP_CAN0_RX0_IRQHandler (void)
+{
+    usbd_isr();
+}
+
+
+
+#ifdef USBD_LOWPWR_MODE_ENABLE
+
+/*!
+    \brief      this function handles USBD wakeup interrupt request.
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
+void USBD_WKUP_IRQHandler (void)
+{
+    exti_interrupt_flag_clear(EXTI_18);
+}
+
+#endif /* USBD_LOWPWR_MODE_ENABLE */

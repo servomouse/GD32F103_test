@@ -7,6 +7,7 @@
                 "Firmware/Include",
                 "Firmware/CMSIS/CoreSupport",
                 "Firmware/Peripherals/Include",
+                "Firmware/Peripherals/USB",
                 "src"
             ],
             "defines": [

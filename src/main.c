@@ -7,6 +7,12 @@
 #include "gd32f10x_rcu.h"
 #include "gd32f10x_gpio.h"
 
+
+#include "cdc_acm_core.h"
+#include "usbd_hw.h"
+
+usb_dev usbd_cdc;
+
 /* Select CPU clock in file system_gd32f10x.c!! */
 
 #define LED_PORT GPIOC
@@ -15,6 +21,34 @@
 void RCU_Config(void);
 void NVIC_Config(void);
 void GPIO_Config(void);
+
+int main_usb(void)
+{
+    /* system clocks configuration */
+    rcu_config();
+
+    /* GPIO configuration */
+    gpio_config();
+
+    /* USB device configuration */
+    usbd_init(&usbd_cdc, &cdc_desc, &cdc_class);
+
+    /* NVIC configuration */
+    nvic_config();
+
+    /* enabled USB pull-up */
+    usbd_connect(&usbd_cdc);
+
+    while (USBD_CONFIGURED != usbd_cdc.cur_status);/* wait for standard USB enumeration is finished */
+
+    while (1)
+	{
+        if (0U == cdc_acm_check_ready(&usbd_cdc))
+            cdc_acm_data_receive(&usbd_cdc);
+        else
+            cdc_acm_data_send(&usbd_cdc);
+    }
+}
 
 int main(void)
 {

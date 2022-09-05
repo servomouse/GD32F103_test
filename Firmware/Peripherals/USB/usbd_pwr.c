@@ -1,6 +1,6 @@
 /*!
-    \file    gd32f10x_libopt.h
-    \brief   library optional for gd32f10x
+    \file    usbd_pwr.c
+    \brief   USB device power management driver
 
     \version 2020-07-17, V3.0.0, firmware for GD32F10x
     \version 2022-06-30, V3.1.0, firmware for GD32F10x
@@ -33,31 +33,29 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef __GD32F10X_LIBOPT_H
-#define __GD32F10X_LIBOPT_H
+#include "usbd_pwr.h"
 
-#include "gd32f10x_fmc.h"
-#include "gd32f10x_pmu.h"
-#include "gd32f10x_bkp.h"
-#include "gd32f10x_rcu.h"
-#include "gd32f10x_exti.h"
-#include "gd32f10x_gpio.h"
-#include "gd32f10x_crc.h"
-#include "gd32f10x_dma.h"
-#include "gd32f10x_dbg.h"
-#include "gd32f10x_adc.h"
-#include "gd32f10x_dac.h"
-#include "gd32f10x_fwdgt.h"
-#include "gd32f10x_wwdgt.h"
-#include "gd32f10x_rtc.h"
-#include "gd32f10x_timer.h"
-#include "gd32f10x_usart.h"
-#include "gd32f10x_i2c.h"
-#include "gd32f10x_spi.h"
-#include "gd32f10x_sdio.h"
-#include "gd32f10x_exmc.h"
-#include "gd32f10x_can.h"
-#include "gd32f10x_enet.h"
-#include "gd32f10x_misc.h"
+/*!
+    \brief      start to remote wakeup
+    \param[in]  udev: pointer to USB core instance
+    \param[out] none
+    \retval     none
+*/
+void usbd_remote_wakeup_active(usb_dev *udev)
+{
+    resume_mcu(udev);
 
-#endif /* __GD32F10X_LIBOPT_H */
+#ifdef LPM_ENABLED
+    if(1U == udev->lpm.L1_remote_wakeup){
+        udev->drv_handler->resume(udev);
+
+        udev->lpm.L1_resume = 1U;
+    }
+#endif /* LPM_ENABLED */
+
+    if(1U == udev->pm.remote_wakeup){
+        udev->pm.remote_wakeup_on = 1U;
+        udev->pm.esof_count = 15U;
+        udev->drv_handler->resume(udev);
+    }
+}

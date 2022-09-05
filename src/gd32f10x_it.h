@@ -2,15 +2,12 @@
     \file    gd32f10x_it.h
     \brief   the header file of the ISR
 
-    \version 2014-12-26, V1.0.0, firmware for GD32F10x
-    \version 2017-06-20, V2.0.0, firmware for GD32F10x
-    \version 2018-07-31, V2.1.0, firmware for GD32F10x
+    \version 2020-07-17, V3.0.0, firmware for GD32F10x
+    \version 2022-06-30, V3.1.0, firmware for GD32F10x
 */
 
 /*
-    Copyright (c) 2018, GigaDevice Semiconductor Inc.
-
-    All rights reserved.
+    Copyright (c) 2022, GigaDevice Semiconductor Inc.
 
     Redistribution and use in source and binary forms, with or without modification, 
 are permitted provided that the following conditions are met:
@@ -36,8 +33,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef GD32F10X_IT_H
-#define GD32F10X_IT_H
+#ifndef __GD32F10X_IT_H
+#define __GD32F10X_IT_H
 
 #include "gd32f10x.h"
 
@@ -61,4 +58,4 @@ void PendSV_Handler(void);
 /* this function handles SysTick exception */
 void SysTick_Handler(void);
 
-#endif /* GD32F10X_IT_H */
+#endif /* __GD32F10X_IT_H */
