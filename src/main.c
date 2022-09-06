@@ -22,13 +22,16 @@ void RCU_Config(void);
 void NVIC_Config(void);
 void GPIO_Config(void);
 
-int main_usb(void)
+int main(void)
 {
     /* system clocks configuration */
     rcu_config();
+	rcu_periph_clock_enable(RCU_GPIOC);
 
     /* GPIO configuration */
     gpio_config();
+	gpio_init(GPIOC, GPIO_MODE_OUT_PP, GPIO_OSPEED_2MHZ, GPIO_PIN_13);
+	gpio_bit_set(LED_PORT, MYLED);
 
     /* USB device configuration */
     usbd_init(&usbd_cdc, &cdc_desc, &cdc_class);
@@ -41,6 +44,7 @@ int main_usb(void)
 
     while (USBD_CONFIGURED != usbd_cdc.cur_status);/* wait for standard USB enumeration is finished */
 
+    gpio_bit_reset(LED_PORT, MYLED);
     while (1)
 	{
         if (0U == cdc_acm_check_ready(&usbd_cdc))
@@ -50,7 +54,7 @@ int main_usb(void)
     }
 }
 
-int main(void)
+int main_blink(void)
 {
     RCU_Config();
 	NVIC_Config();
