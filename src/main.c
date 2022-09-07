@@ -11,6 +11,16 @@
 #include "cdc_acm_core.h"
 #include "usbd_hw.h"
 
+#define ARRAYNUM(arr_nanme)      (uint32_t)(sizeof(arr_nanme) / sizeof(*(arr_nanme)))
+#define TRANSMIT_SIZE            (ARRAYNUM(txbuffer) - 1)
+
+uint8_t txbuffer[] = "\n\rUSART interrupt test\n\r";
+uint8_t rxbuffer[32];
+uint8_t tx_size = TRANSMIT_SIZE;
+uint8_t rx_size = 32;
+__IO uint8_t txcount = 0; 
+__IO uint16_t rxcount = 0; 
+
 usb_dev usbd_cdc;
 
 /* Select CPU clock in file system_gd32f10x.c!! */
@@ -21,8 +31,55 @@ usb_dev usbd_cdc;
 void RCU_Config(void);
 void NVIC_Config(void);
 void GPIO_Config(void);
+void print(uint8_t *str, uint16_t len);
 
-int main(void)
+int main(void)  // UART
+{
+    /* USART interrupt configuration */
+    nvic_irq_enable(USART0_IRQn, 0, 0);
+	rcu_periph_clock_enable(RCU_GPIOC);
+    /* configure COM0 */
+    gd_eval_com_init(EVAL_COM0);
+    /* enable USART TBE interrupt */  
+    usart_interrupt_enable(USART0, USART_INT_TBE);
+	gpio_init(GPIOC, GPIO_MODE_OUT_PP, GPIO_OSPEED_2MHZ, GPIO_PIN_13);
+	gpio_bit_set(LED_PORT, MYLED);
+    
+    /* wait until USART send the transmitter_buffer */
+    while(txcount < tx_size);
+    
+    while(RESET == usart_flag_get(USART0, USART_FLAG_TC));
+    
+    usart_interrupt_enable(USART0, USART_INT_RBNE);
+    systick_config();
+    
+    /* wait until USART receive the receiver_buffer */
+    // while(rxcount < rx_size);
+    // if(rxcount == rx_size)
+    //     printf("\n\rUSART receive successfully!\n\r");
+    while (1)
+    {
+        gpio_bit_set(LED_PORT, MYLED);
+        delay_1ms(500);
+        gpio_bit_reset(LED_PORT, MYLED);
+        delay_1ms(500);
+        print("\n\rHello world!\n\r", 16);
+    }
+}
+
+void print(uint8_t *str, uint16_t len)
+{
+    if(len < sizeof(txbuffer))
+    {
+        memcpy(txbuffer, str, len);
+        tx_size = len;
+        usart_data_transmit(USART0, txbuffer[0]);
+        usart_interrupt_enable(USART0, USART_INT_TBE);
+        txcount = 1;
+    }
+}
+
+int main_usb(void)
 {
     /* system clocks configuration */
     rcu_config();
@@ -52,6 +109,14 @@ int main(void)
         else
             cdc_acm_data_send(&usbd_cdc);
     }
+}
+
+/* retarget the C library printf function to the USART */
+int fputc(int ch, FILE *f)
+{
+    usart_data_transmit(EVAL_COM0, (uint8_t)ch);
+    while (RESET == usart_flag_get(EVAL_COM0, USART_FLAG_TBE));
+    return ch;
 }
 
 int main_blink(void)

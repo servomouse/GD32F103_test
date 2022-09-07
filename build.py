@@ -11,6 +11,7 @@ files = [   "src/gd32f10x_it.c",
             "src/systick.c",
             "Firmware/Peripherals/Source/gd32f10x_rcu.c",
             "Firmware/Peripherals/Source/gd32f10x_gpio.c",
+            "Firmware/Peripherals/Source/gd32f10x_usart.c",
             "Firmware/Peripherals/Source/gd32f10x_misc.c",
             "Firmware/Peripherals/USB/usbd_lld_int.c",
             "Firmware/Peripherals/USB/usbd_lld_core.c",
@@ -48,7 +49,7 @@ compiler_flags =   ["-c",
 
 linker_path = f"{common_path}arm-none-eabi-ld"
 linker_flags = ["-mcpu=cortex-m3 -mthumb",
-                "-specs=nano.specs",
+                "-specs=nano.specs -specs=nosys.specs",
                 "-Tsrc/GD32F103C8Tx_FLASH.ld",
                 "-lc -lm -lnosys",
                 "-Wl,--gc-sections"

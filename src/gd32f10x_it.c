@@ -37,6 +37,16 @@ OF SUCH DAMAGE.
 #include "systick.h"
 #include "usbd_lld_int.h"
 
+/* USART */
+
+extern uint8_t tx_size;
+extern uint8_t rx_size;
+extern __IO uint8_t txcount; 
+extern __IO uint16_t rxcount; 
+extern uint8_t rxbuffer[32];
+extern uint8_t txbuffer[];
+/*===============*/
+
 /*!
     \brief      this function handles NMI exception
     \param[in]  none
@@ -136,14 +146,36 @@ void SysTick_Handler(void)
 	delay_decrement();
 }
 
-/**
- * @brief  This function handles USART0 exception.
- * @param  None
- * @retval None
- */
+
+/*!
+    \brief      this function handles USART RBNE interrupt request and TBE interrupt request
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
 void USART0_IRQHandler(void)
 {
-
+    if(RESET != usart_interrupt_flag_get(USART0, USART_INT_FLAG_RBNE))
+    {
+        /* receive data */
+        rxbuffer[rxcount++] = usart_data_receive(USART0);
+        if(rxcount == rx_size){
+            usart_interrupt_disable(USART0, USART_INT_RBNE);
+        }
+    }
+    if(RESET != usart_interrupt_flag_get(USART0, USART_INT_FLAG_TBE))
+    {
+        /* transmit data */
+        if(tx_size > 0 && tx_size > txcount)
+        {
+            usart_data_transmit(USART0, txbuffer[txcount++]);
+            if(txcount == tx_size)
+            {
+                usart_interrupt_disable(USART0, USART_INT_TBE);
+                tx_size = 0;
+            }
+        }
+    }
 }
 
 /*!
@@ -156,8 +188,6 @@ void USBD_LP_CAN0_RX0_IRQHandler (void)
 {
     usbd_isr();
 }
-
-
 
 #ifdef USBD_LOWPWR_MODE_ENABLE
 
